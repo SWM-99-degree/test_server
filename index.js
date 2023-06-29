@@ -45,7 +45,7 @@ app.get('/oauth', async (req, res) => {
     }
 });
 //open port 3000 for listening
-app.listen(3000, () => {
-    console.log("Server is listening on port 3000");
+app.listen(process.env.PORT || 3000, () => {
+    console.log(`Server is listening on port ${process.env.PORT}`);
 }
 );
