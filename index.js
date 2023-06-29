@@ -14,7 +14,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 //enable cors for all origins
 app.get('/', (req, res) => {
-        res.send('<a href="https://kauth.kakao.com/oauth/authorize?client_id=1dc8739f9827f96eccc7cd66a524c434&redirect_uri=http://localhost:3000/oauth&response_type=code">Login with Kakao</a>');
+        res.send(`<a href="https://kauth.kakao.com/oauth/authorize?client_id=${process.env.KAKAO_REST_API_KEY}&redirect_uri=${process.env.KAKAO_REDIRECT_URI}&response_type=code">Login with Kakao</a>`);
     }
 );
 
