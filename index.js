@@ -5,9 +5,11 @@ const bodyParser = require('body-parser');
 const axios = require('axios');
 const dotenv = require('dotenv');
 const path = require('path');
+const logger = require('morgan')
 dotenv.config();
 //create express app
 const app = express();
+app.use(logger());
 //parse requests of content-type - application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
 //parse requests of content-type - application/json
