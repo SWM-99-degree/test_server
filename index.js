@@ -14,6 +14,8 @@ app.use(logger());
 app.use(bodyParser.urlencoded({ extended: true }));
 //parse requests of content-type - application/json
 app.use(bodyParser.json());
+//user js folder
+app.use(express.static('js'));
 
 
 
@@ -57,38 +59,86 @@ app.listen(process.env.PORT || 3000, () => {
 
 
 app.get('/fcm', async (req, res) =>{
-    res.send(`<html>
-    <head>
-    <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+    res.send(`
+    <!DOCTYPE html>
+<html lang="en">
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyCRGiwGkiatM1kHnKWfd0tXceWHWJxiWRA",
-    authDomain: "jaribean-3af6f.firebaseapp.com",
-    projectId: "jaribean-3af6f",
-    storageBucket: "jaribean-3af6f.appspot.com",
-    messagingSenderId: "508384819940",
-    appId: "1:508384819940:web:f14eda8ab95a047e19caf1",
-    measurementId: "G-CQJ8KGXR9L"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-  const messaging = firebase.messaging();
-  messaging.getToken({vapidKey: "BMfsY5QIeibkEKjH0O_oQxIQMaKLWX5gmYk3K_Lr9WnkT9059twffrB6lFkZRfDxJT6t80DEaawUJIc4RIiqnio"});
-  messaging.onMessage((payload) => {
-    console.log('Message received. ', payload);
-    });
-
-</script>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
 </head>
+<div class="container">
+    <div>Notification data will receive here if the app is open, and focused</div>
+    <div class="message" style="min-height: 80px;"></div>
+    <div>Device Token:</div>
+</div>
+
 <body>
-`)
+    <script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-messaging-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+                    apiKey: "AIzaSyCRGiwGkiatM1kHnKWfd0tXceWHWJxiWRA",
+                    authDomain: "jaribean-3af6f.firebaseapp.com",
+                    projectId: "jaribean-3af6f",
+                    storageBucket: "jaribean-3af6f.appspot.com",
+                    messagingSenderId: "508384819940",
+                    appId: "1:508384819940:web:f14eda8ab95a047e19caf1",
+                    measurementId: "G-CQJ8KGXR9L"
+                };
+                const app = firebase.initializeApp(firebaseConfig)
+                const messaging = firebase.messaging();
+
+        messaging.getToken({ vapidKey: 'BMfsY5QIeibkEKjH0O_oQxIQMaKLWX5gmYk3K_Lr9WnkT9059twffrB6lFkZRfDxJT6t80DEaawUJIc4RIiqnio' }).then((currentToken) => {
+            // app token used for sending notifications
+            if (currentToken) {
+                console.log(currentToken);
+                document.querySelector('body').append(currentToken)
+                sendTokenToServer(currentToken)
+            }else{
+                setTokenSentToServer(false);
+            }
+        }).catch((err) => {
+            // notifications are manually blocked, you can ask for unblock here
+            console.log('An error occurred while retrieving token. ', err);
+            setTokenSentToServer(false);
+        });
+
+        messaging.onMessage((payload) => {
+            // notification data receive here, use it however you want
+            // keep in mind if message receive here, it will not notify in background
+            console.log('Message received. ', payload);
+            const messagesElement = document.querySelector('.message');
+            const dataHeaderElement = document.createElement('h5');
+            const dataElement = document.createElement('pre');
+            dataElement.style = 'overflow-x:hidden;';
+            dataHeaderElement.textContent = 'Message Received:';
+            dataElement.textContent = JSON.stringify(payload, null, 2);
+            messagesElement.appendChild(dataHeaderElement);
+            messagesElement.appendChild(dataElement);
+        });
+
+        function sendTokenToServer(currentToken) {
+            if (!isTokenSentToServer()) {
+                console.log('Sending token to server...');
+                // TODO(developer): Send the current token to your server.
+                setTokenSentToServer(true);
+            } else {
+                console.log('Token already available in the server');
+            }
+        }
+
+        function isTokenSentToServer() {
+            return window.localStorage.getItem('sentToServer') === '1';
+        }
+
+        function setTokenSentToServer(sent) {
+            window.localStorage.setItem('sentToServer', sent ? '1' : '0');
+        }
+    </script>
+</body>
+
+</html>`)
 })
