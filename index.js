@@ -6,6 +6,7 @@ const axios = require('axios');
 const dotenv = require('dotenv');
 const path = require('path');
 const logger = require('morgan')
+const jwt = require('jsonwebtoken');
 dotenv.config();
 //create express app
 const app = express();
@@ -16,6 +17,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 //user js folder
 app.use(express.static('js'));
+const callbackUrlScheme = 'jaribean';
 
 
 
@@ -43,8 +45,8 @@ app.get('/oauth', async (req, res) => {
                 Authorization: `Bearer ${kakaoAccessToken}`,
             },
         });
-
-        res.send(kakaoUser);
+        const token = jwt.sign(kakaoUser, process.env.JWT_SECRET);
+        res.redirect(`${callbackUrlScheme}://login?token=${token}`);
         console.log(kakaoUser);
     }
     catch(error){
