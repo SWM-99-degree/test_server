@@ -61,6 +61,7 @@ app.post('/user/login', (req, res) => {
         res.header('authorization', accessToken);
         const refreshToken = jwt.sign({ userId, userName }, process.env.JWT_SECRET);
         res.header('refreshToken', refreshToken);
+        res.header('Content-Type', 'application/json');
         res.send('login success');
     }
     catch(error){
