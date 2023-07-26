@@ -46,7 +46,7 @@ app.get('/oauth', async (req, res) => {
             },
         });
         const token = jwt.sign(kakaoUser, process.env.JWT_SECRET);
-        res.redirect(`${callbackUrlScheme}://login?token=${token}`);
+        res.redirect(`${callbackUrlScheme}://login?accessToken=${token}&refreshToken=${token}`);
         console.log(kakaoUser);
     }
     catch(error){
