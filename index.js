@@ -27,7 +27,7 @@ app.get('/', (req, res) => {
     }
 );
 
-app.get('/oauth', async (req, res) => {
+app.get('/oauth/kakao', async (req, res) => {
     try{
         const{
             data: {access_token : kakaoAccessToken}
@@ -45,14 +45,30 @@ app.get('/oauth', async (req, res) => {
                 Authorization: `Bearer ${kakaoAccessToken}`,
             },
         });
-        const token = jwt.sign(kakaoUser, process.env.JWT_SECRET);
-        res.redirect(`${callbackUrlScheme}://login?token=${token}`);
+        res.redirect(`${callbackUrlScheme}://login?userId=${kakaoUser.id}&userName=${kakaoUser.properties.nickname}`);
+        // const token = jwt.sign(kakaoUser, process.env.JWT_SECRET);
         console.log(kakaoUser);
     }
     catch(error){
         console.log(error);
     }
 });
+
+app.post('/user/login', (req, res) => {
+    try{
+        const { userId, userName } = req.body;
+        const accessToken = jwt.sign({ userId, userName }, process.env.JWT_SECRET);
+        res.header('authorization', accessToken);
+        const refreshToken = jwt.sign({ userId, userName }, process.env.JWT_SECRET);
+        res.header('refreshToken', refreshToken);
+        res.send('login success');
+    }
+    catch(error){
+        res.status(502).send('error');
+    }
+    
+});
+
 //open port 3000 for listening
 app.listen(process.env.PORT || 3000, () => {
     console.log(`Server is listening on port ${process.env.PORT}`);
