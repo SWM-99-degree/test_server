@@ -76,20 +76,6 @@ app.post('/user/login', async (req, res) => {
     }  
 });
 
-app.post('/user/login', (req, res) => {
-    try{
-        const { userId, userName } = req.body;
-        const accessToken = jwt.sign({ userId, userName }, process.env.JWT_SECRET);
-        const refreshToken = jwt.sign({ userId, userName }, process.env.JWT_SECRET);
-        res.header('Content-Type', 'application/json');
-        res.send(JSON.stringify({ accessToken, refreshToken }));
-    }
-    catch(error){
-        res.status(502).send('error');
-    }
-    
-});
-
 //open port 3000 for listening
 app.listen(process.env.PORT || 3000, () => {
     console.log(`Server is listening on port ${process.env.PORT}`);
