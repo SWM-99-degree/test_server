@@ -39,7 +39,7 @@ app.get('/oauth/kakao', async (req, res) => {
 
 app.post('/user/login/kakao', async (req, res) => {
     try{
-        const { code } = req.body;
+        const { code } = req.params.code;
         const{
             data: {access_token : kakaoAccessToken}
         } = await axios('https://kauth.kakao.com/oauth/token', {
