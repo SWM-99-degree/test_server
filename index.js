@@ -29,7 +29,8 @@ app.get('/', (req, res) => {
 
 app.get('/oauth/kakao', async (req, res) => {
     try{
-        const { code } = req.params.code;
+        //get code from queryparams
+        const { code } = req.query;
         res.redirect(`${callbackUrlScheme}://code?code=${code}`);
     }
     catch(error){
