@@ -48,7 +48,7 @@ app.post('/user/login/kakao', async (req, res) => {
                 grant_type: 'authorization_code',
                 client_id: process.env.KAKAO_REST_API_KEY,
                 redirect_uri: process.env.KAKAO_REDIRECT_URI,
-                code: req.query.code,
+                code: code
             },
         });
 
