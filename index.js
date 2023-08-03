@@ -64,6 +64,7 @@ app.post('/user/login', async (req, res) => {
                 break;
             default:
                 res.status(502).send('login should have type');
+                return;
         }
         const accessToken = jwt.sign({userId, userName}, process.env.JWT_SECRET);
         const refreshToken = jwt.sign({userId, userName}, process.env.JWT_SECRET);
