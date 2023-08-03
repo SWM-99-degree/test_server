@@ -38,28 +38,33 @@ app.get('/oauth/kakao', async (req, res) => {
     }
 });
 
-app.post('/user/login/kakao', async (req, res) => {
+app.post('/user/login', async (req, res) => {
     try{
-        const { code } = req.body;
-        const{
-            data: {access_token : kakaoAccessToken}
-        } = await axios('https://kauth.kakao.com/oauth/token', {
-            params: {
-                grant_type: 'authorization_code',
-                client_id: process.env.KAKAO_REST_API_KEY,
-                redirect_uri: process.env.KAKAO_REDIRECT_URI,
-                code: code
-            },
-        });
-
-        const { data : kakaoUser } = await axios('https://kapi.kakao.com/v2/user/me', {
-            headers: {
-                Authorization: `Bearer ${kakaoAccessToken}`,
-            },
-        });
-        userId = kakaoUser.id;
-        userName = kakaoUser.properties.nickname;
-
+        const { type, code } = req.body;
+        switch(type){
+            case 'kakao':
+                const{
+                    data: {access_token : kakaoAccessToken}
+                } = await axios('https://kauth.kakao.com/oauth/token', {
+                    params: {
+                        grant_type: 'authorization_code',
+                        client_id: process.env.KAKAO_REST_API_KEY,
+                        redirect_uri: process.env.KAKAO_REDIRECT_URI,
+                        code: code
+                    },
+                });
+        
+                const { data : kakaoUser } = await axios('https://kapi.kakao.com/v2/user/me', {
+                    headers: {
+                        Authorization: `Bearer ${kakaoAccessToken}`,
+                    },
+                });
+                userId = kakaoUser.id;
+                userName = kakaoUser.properties.nickname;
+                break;
+            default:
+                res.status(502).send('login should have type');
+        }
         const accessToken = jwt.sign({userId, userName}, process.env.JWT_SECRET);
         const refreshToken = jwt.sign({userId, userName}, process.env.JWT_SECRET);
         res.header('Content-Type', 'application/json');
